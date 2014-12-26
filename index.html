@@ -1,0 +1,116 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Yeo</title>
+    <style>
+        body{
+            margin: 0;
+            padding: 0;
+        }
+    </style>
+</head>
+<script src="pixi.js"></script>
+<body>
+    <div id="viewport"></div>
+    <script>
+        /**
+         * Game scenes
+         * @type {{container: DisplayObjectContainer, setup: Function}}
+         */
+        var Scene01 = {
+            container: new PIXI.DisplayObjectContainer(),
+            sprites: {},
+            setup: function(){
+                this.container = new PIXI.DisplayObjectContainer();
+
+                this.sprites.text = new PIXI.Text('Hello', {fill:'white', font: 'bold 25px Arial'});
+                this.sprites.text1 = new PIXI.Text('Another', {fill:'white', font: 'bold 25px Arial'});
+                this.sprites.text1.position.x = window.innerWidth;
+
+                this.container.addChild(this.sprites.text);
+                this.container.addChild(this.sprites.text1);
+
+
+                window.setTimeout(function(){
+                    Game.scene('Scene02')
+                }, 2000)
+                return this.container;
+            },
+            loop: function() {
+                this.sprites.text.position.x += 1;
+                this.sprites.text1.position.x -= 1;
+
+            }
+        }
+
+        var Scene02 = {
+            container: new PIXI.DisplayObjectContainer(),
+            sprites: {},
+            setup: function(){
+                this.container = new PIXI.DisplayObjectContainer();
+
+                this.sprites.abc = new PIXI.Text('Third', {fill: 'yellow', font: 'bold 23px Arial'})
+                this.container.addChild(this.sprites.abc);
+                window.setTimeout(function () {
+                    Game.scene('Scene01')
+                }, 2000)
+                return this.container;
+            },
+            loop: function () {
+                this.sprites.abc.position.x += 2;
+            }
+        }
+    </script>
+
+    <script>
+        /**
+         * Game here
+         * @type {{container: DisplayObjectContainer, scene: Function}}
+         */
+        var Game = {
+            container: new PIXI.DisplayObjectContainer(),
+            main: {},
+            scene: function(scene) {
+                this.main = eval(scene);
+                this.container = this.main.setup();
+                stage.removeChildren();
+                stage.addChild(Game.container)
+            },
+            run: function() {
+                this.main.loop();
+            }
+        }
+    </script>
+
+    <script>
+        // configuration
+        var config = {
+            stageColor: 0x555555,
+            rendererWidth: window.innerWidth - 4,
+            rendererHeight: window.innerHeight - 4,
+            renderView: document.getElementById('viewport')
+        }
+
+        // setup the stage
+        var stage = new PIXI.Stage(config.stageColor);
+        var renderer = new PIXI.autoDetectRenderer(config.rendererWidth, config.rendererHeight);
+        config.renderView.appendChild(renderer.view);
+
+
+        // game
+        Game.scene('Scene01');
+
+        // start rendering
+        //stage.addChild(Game.container);
+        requestAnimFrame(renderloop);
+        function renderloop() {
+            requestAnimFrame(renderloop);
+
+            Game.run();
+
+            renderer.render(stage)
+        }
+    </script>
+</body>
+</html>
